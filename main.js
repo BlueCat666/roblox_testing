@@ -4,6 +4,9 @@ import bodyParser from "body-parser";
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(bodyParser.json());
+
+
 app.get("/", (req, res) => {
     console.log("reached here");
     res.sendStatus(200);
