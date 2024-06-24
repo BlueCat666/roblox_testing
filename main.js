@@ -9,7 +9,7 @@ app.get("/", (req, res) => {
     res.sendStatus(200);
 });
 
-app.get("/post", (req, res) => {
+app.post("/post", (req, res) => {
   console.log(req.body);
   res.sendStatus(200);
 });
