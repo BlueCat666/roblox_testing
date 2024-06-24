@@ -9,6 +9,11 @@ app.get("/", (req, res) => {
     res.sendStatus(200);
 });
 
+app.get("/post", (req, res) => {
+  console.log(req.body);
+  res.sendStatus(200);
+});
+
 app.listen(port, () => {
   console.log(`Server listening to ${port}`);
 });
