@@ -24,7 +24,7 @@ app.get("/players", (req, res) => {
 app.get("/get-head-thumbnail", async (req, res) => {
   const userID = req.query.userID;
   try {
-    const { data } = await axios.get(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userID}&size=48x48&format=Png&isCircular=false`,);
+    const { data } = await axios.get(`https://thumbnails.roblox.com/v1/users/avatar-bust?userIds=${userID}&size=48x48&format=Png&isCircular=false`,);
     res.json(data);
   } catch (error) {
     console.error('Error fetching thumbnail:', error);
