@@ -10,40 +10,60 @@ app.use(cors());
 app.use(bodyParser.json());
 
 let Servers = [
-  // {
-  //   '2161db5d-5a39-415d-a54c-37d556b353ff': [
-  //     {
-  //       Name: 'SaloPor_23',
-  //       AccountAge: 440,
-  //       UserID: 4538764244,
-  //       HasVerifiedBadge: false,
-  //       DisplayName: 'ST4R'
-  //     },
-  //     {
-  //       Name: 'Lucamartin581',
-  //       AccountAge: 936,
-  //       UserID: 3121604735,
-  //       HasVerifiedBadge: false,
-  //       DisplayName: 'Lucamartin581'
-  //     }
-  //   ]
-  // }
+  {
+    '2161db5d-5a39-415d-a54c-37d556b353ff': [
+      {
+        Name: 'SaloPor_23',
+        AccountAge: 440,
+        UserID: 4538764244,
+        HasVerifiedBadge: false,
+        DisplayName: 'ST4R'
+      },
+      {
+        Name: 'Lucamartin581',
+        AccountAge: 936,
+        UserID: 3121604735,
+        HasVerifiedBadge: false,
+        DisplayName: 'Lucamartin581'
+      }
+    ]
+  },
+  {
+    '2161db5d-5a39-415d-a54c-37d556b353ff': [
+      {
+        Name: 'SaloPor_23',
+        AccountAge: 440,
+        UserID: 4538764244,
+        HasVerifiedBadge: false,
+        DisplayName: 'ST4R'
+      },
+      {
+        Name: 'Lucamartin581',
+        AccountAge: 936,
+        UserID: 3121604735,
+        HasVerifiedBadge: false,
+        DisplayName: 'Lucamartin581'
+      }
+    ]
+  }
 ];
 
 async function modifyPlayers(serversArray) {
-  const modifiedPlayers = [];
+  const modifiedServers = [];
 
-  for (const serverID in serversArray) {
-    const players = serversArray[serverID];
+  for (const server of serversArray) {
+    const serverID = Object.keys(server)[0]; 
+    const players = server[serverID];
 
-    for (const player of players) {
-      const playerThumbnail = await getPlayerHeadThumbnail(player.UserID);
-      player.headThumbnail = playerThumbnail;
-      modifiedPlayers.push(player);
-    }
+    const modifiedPlayers = await Promise.all(players.map(async (player) => ({
+      ...player,
+      headThumbnail: await getPlayerHeadThumbnail(player.UserID)
+    })));
+
+    modifiedServers.push({ [serverID]: modifiedPlayers });
   }
 
-  return modifiedPlayers;
+  return modifiedServers;
 }
 
 
