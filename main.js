@@ -9,13 +9,32 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-let Servers = [];
+let Servers = [
+  // {
+  //   '2161db5d-5a39-415d-a54c-37d556b353ff': [
+  //     {
+  //       Name: 'SaloPor_23',
+  //       AccountAge: 440,
+  //       UserID: 4538764244,
+  //       HasVerifiedBadge: false,
+  //       DisplayName: 'ST4R'
+  //     },
+  //     {
+  //       Name: 'Lucamartin581',
+  //       AccountAge: 936,
+  //       UserID: 3121604735,
+  //       HasVerifiedBadge: false,
+  //       DisplayName: 'Lucamartin581'
+  //     }
+  //   ]
+  // }
+];
 
 async function modifyPlayers(serversArray) {
   const modifiedPlayers = [];
 
-  for (const server of serversArray) {
-    const [serverID, players] = Object.entries(server)[0];
+  for (const serverID in serversArray) {
+    const players = serversArray[serverID];
 
     for (const player of players) {
       const playerThumbnail = await getPlayerHeadThumbnail(player.UserID);
@@ -52,13 +71,12 @@ async function getPlayerHeadThumbnail(userID) {
 }
 
 app.get("/", (req, res) => {
-  // console.log("reached here");
+  console.log("reached here");
   res.sendStatus(200);
 });
 
 app.get("/players", async (req, res) => {
   const modifiedPlayers = await modifyPlayers(Servers);
-  console.log(modifiedPlayers);
   res.json(modifiedPlayers);
 });
 
