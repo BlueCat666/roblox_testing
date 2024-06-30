@@ -95,24 +95,10 @@ app.get("/players", async (req, res) => {
   res.json(modifiedPlayers);
 });
 
-// app.get("/get-head-thumbnail", async (req, res) => {
-//   //make is so it will get profile pic in players and not in another request
-//   const userID = req.query.userID;
-//   try {
-//     const { data } = await axios.get(
-//       `https://thumbnails.roblox.com/v1/users/avatar-bust?userIds=${userID}&size=48x48&format=Png&isCircular=false`
-//     );
-//     res.json(data);
-//   } catch (error) {
-//     console.error("Error fetching thumbnail:", error);
-//     res.status(500).json({ error: "Error fetching thumbnail" });
-//   }
-// });
-
 app.post("/post", (req, res) => {
   //make it so when u get player data it will modify it here
   console.log(req.body);
-  Players = req.body;
+  Servers = req.body;
   res.sendStatus(200);
 });
 
