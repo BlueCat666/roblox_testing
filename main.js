@@ -52,7 +52,7 @@ async function getPlayerHeadThumbnail(userID) {
 }
 
 app.get("/", (req, res) => {
-  console.log("reached here");
+  // console.log("reached here");
   res.sendStatus(200);
 });
 
@@ -64,7 +64,7 @@ app.get("/players", async (req, res) => {
 
 app.post("/post", (req, res) => {
   //make it so when u get player data it will modify it here
-  console.log(req.body);
+  // console.log(req.body);
   Servers = req.body;
   res.sendStatus(200);
 });
