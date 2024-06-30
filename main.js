@@ -9,40 +9,7 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-const Servers = [
-  {
-    '2161db5d-5a39-415d-a54c-37d556b353ff': [
-      {
-        Name: 'SaloPor_23',
-        AccountAge: 440,
-        UserID: 4538764244,
-        HasVerifiedBadge: false,
-        DisplayName: 'ST4R'
-      },
-      {
-        Name: 'Lucamartin581',
-        AccountAge: 936,
-        UserID: 3121604735,
-        HasVerifiedBadge: false,
-        DisplayName: 'Lucamartin581'
-      },
-      {
-        Name: 'Arellyscueva2016',
-        AccountAge: 318,
-        UserID: 4938845599,
-        HasVerifiedBadge: false,
-        DisplayName: 'Arellyscueva2016'
-      },
-      {
-        Name: 'AlexPor2018',
-        AccountAge: 417,
-        UserID: 4608231204,
-        HasVerifiedBadge: false,
-        DisplayName: 'Alex'
-      }
-    ]
-  }
-];
+let Servers = [];
 
 async function modifyPlayers(serversArray) {
   const modifiedPlayers = [];
