@@ -48,19 +48,18 @@ let Servers = [
   }
 ];
 
-async function modifyPlayers(serversArray) {
-  const modifiedServers = [];
+async function modifyPlayers(serversObject) {
+  const modifiedServers = {};
 
-  for (const server of serversArray) {
-    const serverID = Object.keys(server)[0]; 
-    const players = server[serverID];
+  for (const serverID in serversObject) {
+    const players = serversObject[serverID];
 
-    const modifiedPlayers = await Promise.all(players.map(async (player) => ({
-      ...player,
-      headThumbnail: await getPlayerHeadThumbnail(player.UserID)
-    })));
+    const modifiedPlayers = await Promise.all(players.map(async (player) => {
+      const playerThumbnail = await getPlayerHeadThumbnail(player.UserID);
+      return { ...player, headThumbnail: playerThumbnail };
+    }));
 
-    modifiedServers.push({ [serverID]: modifiedPlayers });
+    modifiedServers[serverID] = modifiedPlayers;
   }
 
   return modifiedServers;
