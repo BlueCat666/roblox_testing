@@ -96,7 +96,6 @@ app.post("/post", (req, res) => {
     }
   }
   
-  console.log('Updated Servers Data:', serverId);
   res.sendStatus(200);
 });
 
