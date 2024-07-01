@@ -9,44 +9,11 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-let Servers = [
-  {
-    '2161db5d-5a39-415d-a54c-37d556b353ff': [
-      {
-        Name: 'SaloPor_23',
-        AccountAge: 440,
-        UserID: 4538764244,
-        HasVerifiedBadge: false,
-        DisplayName: 'ST4R'
-      },
-      {
-        Name: 'Lucamartin581',
-        AccountAge: 936,
-        UserID: 3121604735,
-        HasVerifiedBadge: false,
-        DisplayName: 'Lucamartin581'
-      }
-    ]
-  },
-  {
-    '2161db5d-5a39-415d-a54c-37d556b353ff': [
-      {
-        Name: 'SaloPor_23',
-        AccountAge: 440,
-        UserID: 4538764244,
-        HasVerifiedBadge: false,
-        DisplayName: 'ST4R'
-      },
-      {
-        Name: 'Lucamartin581',
-        AccountAge: 936,
-        UserID: 3121604735,
-        HasVerifiedBadge: false,
-        DisplayName: 'Lucamartin581'
-      }
-    ]
-  }
-];
+let serversData = {};
+let serverTimestamps = {};
+
+const INACTIVE_THRESHOLD = 10000;
+const CLEANUP_INTERVAL = 5000;
 
 async function modifyPlayers(serversObject) {
   const modifiedServers = {};
@@ -89,20 +56,47 @@ async function getPlayerHeadThumbnail(userID) {
   }
 }
 
+function removeInactiveServers() {
+  const currentTime = Date.now();
+  for (const serverId in serverTimestamps) {
+    if (serverTimestamps.hasOwnProperty(serverId)) {
+      if (currentTime - serverTimestamps[serverId] > INACTIVE_THRESHOLD) {
+        // Remove inactive server data
+        delete serversData[serverId];
+        delete serverTimestamps[serverId];
+        console.log(`Removed inactive server: ${serverId}`);
+      }
+    }
+  }
+}
+
+setInterval(removeInactiveServers, CLEANUP_INTERVAL);
+
 app.get("/", (req, res) => {
   console.log("reached here");
   res.sendStatus(200);
 });
 
 app.get("/players", async (req, res) => {
-  const modifiedPlayers = await modifyPlayers(Servers);
+  const modifiedPlayers = await modifyPlayers(serversData);
+  console.log(serverTimestamps);
   res.json(modifiedPlayers);
 });
 
 app.post("/post", (req, res) => {
   //make it so when u get player data it will modify it here
-  // console.log(req.body);
-  Servers = req.body;
+  const serverData = req.body;
+
+  for (const serverId in serverData) {
+    if (serverData.hasOwnProperty(serverId)) {
+      // Update server data
+      serversData[serverId] = serverData[serverId];
+      // Update the timestamp for the server
+      serverTimestamps[serverId] = Date.now();
+    }
+  }
+  
+  console.log('Updated Servers Data:', serversData);
   res.sendStatus(200);
 });
 
