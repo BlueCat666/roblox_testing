@@ -29,8 +29,6 @@ async function modifyPlayers(serversObject) {
 
   const playerThumbnails = await getPlayerHeadThumbnail(allUserIds);
 
-  console.log(playerThumbnails);
-
   const thumbnailMap = {};
   playerThumbnails.forEach(thumbnail => {
     if (thumbnail && thumbnail.imageUrl) {
@@ -87,7 +85,7 @@ function removeInactiveServers() {
         // Remove inactive server data
         delete serversData[serverId];
         delete serverTimestamps[serverId];
-        // console.log(`Removed inactive server: ${serverId}`);
+        console.log(`Removed inactive server: ${serverId}`);
       }
     }
   }
@@ -115,10 +113,10 @@ app.post("/post", (req, res) => {
       serversData[serverId] = serverData[serverId];
       // Update the timestamp for the server
       serverTimestamps[serverId] = Date.now();
+      console.log('Updated Servers Data:', serverId);
     }
   }
 
-  // console.log('Updated Servers Data:',);
   res.sendStatus(200);
 });
 
