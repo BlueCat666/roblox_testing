@@ -29,12 +29,14 @@ async function modifyPlayers(serversObject) {
 
   const playerThumbnails = await getPlayerHeadThumbnail(allUserIds);
 
+  console.log(playerThumbnails);
+
   const thumbnailMap = {};
   playerThumbnails.forEach(thumbnail => {
     if (thumbnail && thumbnail.imageUrl) {
       thumbnailMap[thumbnail.targetId] = thumbnail.imageUrl;
     } else {
-      thumbnailMap[thumbnail.targetId] = null; // Handle case where thumbnail might be null
+      thumbnailMap[thumbnail.targetId] = null;
     }
   });
 
@@ -85,7 +87,7 @@ function removeInactiveServers() {
         // Remove inactive server data
         delete serversData[serverId];
         delete serverTimestamps[serverId];
-        console.log(`Removed inactive server: ${serverId}`);
+        // console.log(`Removed inactive server: ${serverId}`);
       }
     }
   }
@@ -99,7 +101,7 @@ app.get("/", (req, res) => {
 
 app.get("/players", async (req, res) => {
   const modifiedPlayers = await modifyPlayers(serversData);
-  console.log(serverTimestamps);
+  // console.log(serverTimestamps);
   res.json(modifiedPlayers);
 });
 
