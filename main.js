@@ -31,7 +31,11 @@ async function modifyPlayers(serversObject) {
 
   const thumbnailMap = {};
   playerThumbnails.forEach(thumbnail => {
-    thumbnailMap[thumbnail.targetId] = thumbnail.imageUrl;
+    if (thumbnail && thumbnail.imageUrl) {
+      thumbnailMap[thumbnail.targetId] = thumbnail.imageUrl;
+    } else {
+      thumbnailMap[thumbnail.targetId] = null; // Handle case where thumbnail might be null
+    }
   });
 
   for (const serverID in serversObject) {
