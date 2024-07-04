@@ -36,7 +36,7 @@ async function modifyPlayers(serversObject) {
     if (thumbnail && thumbnail.imageUrl) {
       thumbnailMap[thumbnail.targetId] = thumbnail.imageUrl;
     } else {
-      thumbnailMap[thumbnail.targetId] = null;
+      return;
     }
   });
 
