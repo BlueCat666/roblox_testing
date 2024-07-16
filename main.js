@@ -91,6 +91,27 @@ function removeInactiveServers() {
   }
 }
 
+async function getGameData() {
+  try {
+    const [gameResponse, votesResponse] = await Promise.all([
+      axios.get('https://games.roblox.com/v1/games?universeIds=5929324911'),
+      axios.get('https://games.roblox.com/v1/games/votes?universeIds=5929324911')
+    ]);
+
+    let data = gameResponse.data.data[0];
+    const votes = votesResponse.data.data[0];
+
+    data.upVotes = votes.upVotes;
+    data.downVotes = votes.downVotes;
+
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching game data:", error);
+    return [];
+  }
+}
+
 setInterval(removeInactiveServers, CLEANUP_INTERVAL);
 
 app.get("/", (req, res) => {
@@ -101,6 +122,12 @@ app.get("/players", async (req, res) => {
   const modifiedPlayers = await modifyPlayers(serversData);
   // console.log(serverTimestamps);
   res.json(modifiedPlayers);
+});
+
+app.get("/get-game-data", async (req,res) => {
+
+
+  res.json(await getGameData()); 
 });
 
 app.post("/post", (req, res) => {
