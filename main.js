@@ -1,7 +1,22 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import express from "express";
 import axios from "axios";
 import bodyParser from "body-parser";
 import cors from "cors";
+import admin from "firebase-admin"
+
+
+admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+  }),
+});
+
+console.log(process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'));
+
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -114,6 +129,22 @@ async function getGameData() {
 
 setInterval(removeInactiveServers, CLEANUP_INTERVAL);
 
+const authenticate = async (req, res, next) => {
+  const idToken = req.headers.authorization?.split("Bearer ")[1];
+  if (!idToken) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    req.user = decodedToken;
+    next();
+  } catch (error) {
+    console.error("Error verifying ID token:", error);
+    res.status(401).send("Unauthorized");
+  }
+};
+
 app.get("/", (req, res) => {
   res.sendStatus(200);
 });
@@ -124,9 +155,7 @@ app.get("/players", async (req, res) => {
   res.json(modifiedPlayers);
 });
 
-app.get("/get-game-data", async (req,res) => {
-
-
+app.get("/get-game-data", authenticate, async (req,res) => {
   res.json(await getGameData()); 
 });
 
