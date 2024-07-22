@@ -147,13 +147,13 @@ app.get("/", (req, res) => {
   res.sendStatus(200);
 });
 
-app.get("/players", authenticate, async (req, res) => {
+app.get("/players", async (req, res) => {
   const modifiedPlayers = await modifyPlayers(serversData);
   // console.log(serverTimestamps);
   res.json(modifiedPlayers);
 });
 
-app.get("/get-game-data", authenticate, async (req,res) => {
+app.get("/get-game-data", async (req,res) => {
   res.json(await getGameData()); 
 });
 
