@@ -15,7 +15,6 @@ admin.initializeApp({
   }),
 });
 
-console.log(process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'));
 
 
 const app = express();
@@ -100,7 +99,6 @@ function removeInactiveServers() {
         // Remove inactive server data
         delete serversData[serverId];
         delete serverTimestamps[serverId];
-        console.log(`Removed inactive server: ${serverId}`);
       }
     }
   }
@@ -149,7 +147,7 @@ app.get("/", (req, res) => {
   res.sendStatus(200);
 });
 
-app.get("/players", async (req, res) => {
+app.get("/players", authenticate, async (req, res) => {
   const modifiedPlayers = await modifyPlayers(serversData);
   // console.log(serverTimestamps);
   res.json(modifiedPlayers);
@@ -169,12 +167,30 @@ app.post("/post", (req, res) => {
       serversData[serverId] = serverData[serverId];
       // Update the timestamp for the server
       serverTimestamps[serverId] = Date.now();
-      console.log('Updated Servers Data:', serverId);
     }
   }
 
   res.sendStatus(200);
 });
+
+app.post("/kick", async (req, res) => {
+  const { userID } = req.body;
+
+  if (!userID) {
+    return res.status(400).json({ message: "UserID is required" });
+  }
+
+  try {
+    console.log(userID);
+
+
+    res.status(200).json({ message: "Player kicked successfully" });
+  } catch (error) {
+    console.error('Error handling /kick request:', error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Server listening to ${port}`);
