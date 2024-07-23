@@ -1,202 +1,28 @@
 import dotenv from 'dotenv';
 dotenv.config();
-import express from "express";
-import axios from "axios";
-import bodyParser from "body-parser";
-import cors from "cors";
-import admin from "firebase-admin"
-
-
-admin.initializeApp({
-  credential: admin.credential.cert({
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-  }),
-});
-
-
+import express from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import { initializeApp } from './config/firebaseConfig.js';
+import gameRoutes from './routes/gameRoutes.js';
+import playerRoutes from './routes/playerRoutes.js';
+import serverRoutes from './routes/serverRoutes.js';
+import { removeInactiveServers } from './controllers/serverController.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+initializeApp();
+
 app.use(cors());
 app.use(bodyParser.json());
 
-let serversData = {};
-let serverTimestamps = {};
+app.use('/', gameRoutes);
+app.use('/', playerRoutes);
+app.use('/', serverRoutes);
 
-const INACTIVE_THRESHOLD = 10000;
-const CLEANUP_INTERVAL = 5000;
-
-
-async function modifyPlayers(serversObject) {
-  const modifiedServers = {};
-  const allUserIds = [];
-
-  for (const serverID in serversObject) {
-    const players = serversObject[serverID];
-    players.forEach(player => {
-      allUserIds.push(player.UserID);
-    });
-  }
-
-  const playerThumbnails = await getPlayerHeadThumbnail(allUserIds);
-
-  const thumbnailMap = {};
-  playerThumbnails.forEach(thumbnail => {
-    if (thumbnail && thumbnail.imageUrl) {
-      thumbnailMap[thumbnail.targetId] = thumbnail.imageUrl;
-    } else {
-      return;
-    }
-  });
-
-  for (const serverID in serversObject) {
-    const players = serversObject[serverID];
-
-    modifiedServers[serverID] = players.map(player => {
-      return {
-        ...player,
-        headThumbnail: thumbnailMap[player.UserID] || null,
-      };
-    });
-  }
-
-  return modifiedServers;
-}
-
-async function getPlayerHeadThumbnail(userArrayID) {
-  try {
-    const userIds = userArrayID.join(",");
-    const response = await axios.get(
-      `https://thumbnails.roblox.com/v1/users/avatar-bust?userIds=${userIds}&size=48x48&format=Png&isCircular=false`
-    );
-
-    const thumbnails = response.data.data.map((thumbnailData) => {
-      if (thumbnailData && thumbnailData.state === "Completed") {
-        return {
-          targetId: thumbnailData.targetId,
-          imageUrl: thumbnailData.imageUrl,
-        };
-      } else {
-        return null;
-      }
-    });
-
-    return thumbnails;
-  } catch (error) {
-    console.error("Error fetching thumbnails:", error);
-    return [];
-  }
-}
-
-function removeInactiveServers() {
-  const currentTime = Date.now();
-  for (const serverId in serverTimestamps) {
-    if (serverTimestamps.hasOwnProperty(serverId)) {
-      if (currentTime - serverTimestamps[serverId] > INACTIVE_THRESHOLD) {
-        // Remove inactive server data
-        delete serversData[serverId];
-        delete serverTimestamps[serverId];
-      }
-    }
-  }
-}
-
-async function getGameData() {
-  try {
-    const [gameResponse, votesResponse] = await Promise.all([
-      axios.get('https://games.roblox.com/v1/games?universeIds=5929324911'),
-      axios.get('https://games.roblox.com/v1/games/votes?universeIds=5929324911')
-    ]);
-
-    let data = gameResponse.data.data[0];
-    const votes = votesResponse.data.data[0];
-
-    data.upVotes = votes.upVotes;
-    data.downVotes = votes.downVotes;
-
-    return data;
-  } catch (error) {
-    console.error("Error fetching game data:", error);
-    return [];
-  }
-}
-
-setInterval(removeInactiveServers, CLEANUP_INTERVAL);
-
-const authenticate = async (req, res, next) => {
-  const idToken = req.headers.authorization?.split("Bearer ")[1];
-  if (!idToken) {
-    return res.status(401).send("Unauthorized");
-  }
-
-  try {
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
-    req.user = decodedToken;
-    next();
-  } catch (error) {
-    console.error("Error verifying ID token:", error);
-    res.status(401).send("Unauthorized");
-  }
-};
-
-app.get("/", (req, res) => {
-  res.sendStatus(200);
-});
-
-app.get("/players", async (req, res) => {
-  const modifiedPlayers = await modifyPlayers(serversData);
-  // console.log(serverTimestamps);
-  res.json(modifiedPlayers);
-});
-
-app.get("/get-game-data", async (req,res) => {
-  res.json(await getGameData()); 
-});
-
-app.post("/post", (req, res) => {
-  //make it so when u get player data it will modify it here
-  const serverData = req.body;
-
-  for (const serverId in serverData) {
-    if (serverData.hasOwnProperty(serverId)) {
-      // Update server data
-      serversData[serverId] = serverData[serverId];
-      // Update the timestamp for the server
-      serverTimestamps[serverId] = Date.now();
-    }
-  }
-
-  res.sendStatus(200);
-});
-
-let playerData = {};
-
-app.post("/kick", async (req, res) => {
-  const { userID } = req.body;
-
-  if (!userID) {
-    return res.status(400).json({ message: "UserID is required" });
-  }
-
-  try {
-    playerData[userID] = { status: "kick" };
-
-    res.status(200).json({ message: "Player kicked successfully" });
-  } catch (error) {
-    console.error('Error handling /kick request:', error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-app.get("/get-data", async (req, res) => {
-    res.json(playerData);
-    playerData = {};
-});
-
+setInterval(removeInactiveServers, 5000);
 
 app.listen(port, () => {
-  console.log(`Server listening to ${port}`);
+  console.log(`Server listening on port ${port}`);
 });
