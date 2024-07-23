@@ -6,7 +6,6 @@ import cors from 'cors';
 import { initializeApp } from './config/firebaseConfig.js';
 import gameRoutes from './routes/gameRoutes.js';
 import playerRoutes from './routes/playerRoutes.js';
-import serverRoutes from './routes/serverRoutes.js';
 import { removeInactiveServers } from './controllers/serverController.js';
 
 const app = express();
@@ -19,7 +18,6 @@ app.use(bodyParser.json());
 
 app.use('/', gameRoutes);
 app.use('/', playerRoutes);
-app.use('/', serverRoutes);
 
 setInterval(removeInactiveServers, 5000);
 
