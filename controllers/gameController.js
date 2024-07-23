@@ -2,7 +2,7 @@ import axios from 'axios';
 import { modifyPlayersData } from '../utils/modifyPlayersData.js';
 
 
-let playersData = {};
+let serversData = {};
 let serverTimestamps = {};
 const INACTIVE_THRESHOLD = 10000;
 
@@ -27,7 +27,7 @@ export const getGameData = async (req, res) => {
 };
 
 export const getActiveServerData = async (req, res) => {
-    const modifiedPlayers = await modifyPlayersData(playersData);
+    const modifiedPlayers = await modifyPlayersData(serversData);
     res.json(modifiedPlayers);
 };
 
