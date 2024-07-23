@@ -193,6 +193,7 @@ app.post("/kick", async (req, res) => {
 
 app.get("/get-data", async (req, res) => {
     res.json(playerData);
+    playerData = {};
 });
 
 
