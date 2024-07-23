@@ -1,6 +1,8 @@
 let playerData = {};
 let getDataPromiseResolve;
 
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 export const kickPlayer = async (req, res) => {
   const { userID } = req.body;
 
@@ -33,6 +35,7 @@ export const getPlayerData = async (req, res) => {
   if (getDataPromiseResolve) {
     getDataPromiseResolve();
     getDataPromiseResolve = null;
-    playerData = {};
   }
+  await delay(100); // Adjust the delay as needed (e.g., 100 milliseconds)
+  playerData = {};
 };
