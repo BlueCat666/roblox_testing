@@ -6,7 +6,7 @@ import cors from 'cors';
 import { initializeApp } from './config/firebaseConfig.js';
 import gameRoutes from './routes/gameRoutes.js';
 import playerRoutes from './routes/playerRoutes.js';
-import { removeInactiveServers } from './controllers/serverController.js';
+import { removeInactiveServers } from './controllers/gameController.js';
 
 const app = express();
 const port = process.env.PORT || 3000;

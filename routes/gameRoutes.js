@@ -1,6 +1,5 @@
 import express from 'express';
-import { getGameData } from '../controllers/gameController.js';
-import { saveActiveServers, getActiveServerData } from '../controllers/gameController.js';
+import { saveActiveServers, getActiveServerData, getGameData } from '../controllers/gameController.js';
 
 const router = express.Router();
 
