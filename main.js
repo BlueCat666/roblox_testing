@@ -117,7 +117,6 @@ async function getGameData() {
     data.upVotes = votes.upVotes;
     data.downVotes = votes.downVotes;
 
-    console.log(data);
     return data;
   } catch (error) {
     console.error("Error fetching game data:", error);
@@ -173,6 +172,8 @@ app.post("/post", (req, res) => {
   res.sendStatus(200);
 });
 
+let playerData = {};
+
 app.post("/kick", async (req, res) => {
   const { userID } = req.body;
 
@@ -181,14 +182,17 @@ app.post("/kick", async (req, res) => {
   }
 
   try {
-    console.log(userID);
-
+    playerData[userID] = { status: "kick" };
 
     res.status(200).json({ message: "Player kicked successfully" });
   } catch (error) {
     console.error('Error handling /kick request:', error);
     res.status(500).json({ message: "Internal server error" });
   }
+});
+
+app.get("/get-data", async (req, res) => {
+    res.json(playerData);
 });
 
 
